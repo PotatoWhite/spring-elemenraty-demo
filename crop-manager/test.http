@@ -1,0 +1,24 @@
+POST localhost:8080/api/crops
+Content-Type: application/json
+
+{
+  "name":"potato",
+  "class_name":"root"
+  }
+
+###
+
+PATCH localhost:8080/api/crops/1
+Content-Type: application/json
+
+{
+  "name":"potato1",
+  "class_name":"root"
+}
+
+###
+
+GET localhost:8080/api/crops/1
+
+
+###
