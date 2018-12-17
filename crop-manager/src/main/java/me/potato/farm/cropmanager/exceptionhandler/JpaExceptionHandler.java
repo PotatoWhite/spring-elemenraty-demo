@@ -8,13 +8,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
-public class JpaExectionHandler {
+public class JpaExceptionHandler {
 
 	@ExceptionHandler(JDBCConnectionException.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
 	@ResponseBody
 	public String handler(JDBCConnectionException ex){
 		return ex.getMessage();
 	}
-
 }

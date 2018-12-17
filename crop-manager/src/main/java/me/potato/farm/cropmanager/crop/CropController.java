@@ -45,8 +45,8 @@ public class CropController {
 
 
 	@HystrixCommand(
-			 fallbackMethod = "fallback"
-			, ignoreExceptions = {JDBCConnectionException.class}
+			commandProperties = {@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "5000")}
+			, fallbackMethod = "fallback"
 	)
 	@PostMapping("/api/crops")
 	public ResponseEntity createCrop(@RequestBody CropDto cropDto) {
@@ -66,7 +66,7 @@ public class CropController {
 	public ResponseEntity fallback(CropDto cropDto, Throwable throwable) {
 
 		return ResponseEntity
-				.status(HttpStatus.INSUFFICIENT_STORAGE)
+				.status(HttpStatus.SERVICE_UNAVAILABLE)
 				.body(throwable.getMessage());
 
 	}
