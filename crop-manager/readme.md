@@ -1,6 +1,8 @@
 # Crop-Manager
 - Item:Crop을 CRUD 하는 관리성 API Server 이다.
 
+1. 프로젝트 생성
+2. Test001 - ap
 
 ## Project 생성
 1. spring boot initializer를 통해 프로젝트를 생성한다.
