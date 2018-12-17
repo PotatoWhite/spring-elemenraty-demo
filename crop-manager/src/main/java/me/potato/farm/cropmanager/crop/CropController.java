@@ -3,6 +3,7 @@ package me.potato.farm.cropmanager.crop;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.JDBCConnectionException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.PersistenceException;
 import java.util.Optional;
 
 @Slf4j
@@ -42,10 +44,9 @@ public class CropController {
 	}
 
 
-	@HystrixCommand(commandProperties =
-		{@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "500")}
-		, fallbackMethod = "fallback"
-		, ignoreExceptions = {NullPointerException.class}
+	@HystrixCommand(
+			 fallbackMethod = "fallback"
+			, ignoreExceptions = {JDBCConnectionException.class}
 	)
 	@PostMapping("/api/crops")
 	public ResponseEntity createCrop(@RequestBody CropDto cropDto) {
@@ -62,11 +63,11 @@ public class CropController {
 
 	}
 
-	public ResponseEntity fallback(CropDto cropDto) {
-		log.info("fallback");
+	public ResponseEntity fallback(CropDto cropDto, Throwable throwable) {
+
 		return ResponseEntity
 				.status(HttpStatus.INSUFFICIENT_STORAGE)
-				.body("fallback");
+				.body(throwable.getMessage());
 
 	}
 

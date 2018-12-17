@@ -1,3 +1,5 @@
+### POST
+
 POST localhost:8080/api/crops
 Content-Type: application/json
 
@@ -6,7 +8,7 @@ Content-Type: application/json
   "class_name":"root"
   }
 
-###
+### PATCH
 
 PATCH localhost:8080/api/crops/1
 Content-Type: application/json
@@ -16,7 +18,7 @@ Content-Type: application/json
   "class_name":"root"
 }
 
-###
+### GET 1
 
 GET localhost:8080/api/crops/1
 

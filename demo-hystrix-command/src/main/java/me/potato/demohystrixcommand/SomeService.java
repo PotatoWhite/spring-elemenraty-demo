@@ -12,7 +12,7 @@ public class SomeService {
 		throw new Exception("An exception occured");
 	}
 
-	private String fallback(){
+	private String fallback(Throwable ex){
 		return "fallback";
 	}
 }
