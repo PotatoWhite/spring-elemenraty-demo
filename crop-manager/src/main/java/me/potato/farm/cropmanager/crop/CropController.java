@@ -1,18 +1,18 @@
 package me.potato.farm.cropmanager.crop;
 
-import com.sun.net.httpserver.HttpsConfigurator;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.Optional;
 
-
+@Slf4j
 @RestController
 public class CropController {
 
@@ -34,7 +34,7 @@ public class CropController {
 	public ResponseEntity getCrop(@PathVariable("id") Long id) {
 
 		Optional<Crop> crop = service.getCrop(id);
-		if(!crop.isPresent())
+		if (!crop.isPresent())
 			return ResponseEntity.noContent().build();
 		else {
 			return ResponseEntity.ok(mapper.map(crop.get(), CropDto.class));
@@ -42,23 +42,39 @@ public class CropController {
 	}
 
 
+	@HystrixCommand(commandProperties =
+		{@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "500")}
+		, fallbackMethod = "fallback"
+		, ignoreExceptions = {NullPointerException.class}
+	)
 	@PostMapping("/api/crops")
 	public ResponseEntity createCrop(@RequestBody CropDto cropDto) {
+
 		Crop saved = service.saveCrop(
-								mapper.map(cropDto, Crop.class)
-								);
+				mapper.map(cropDto, Crop.class)
+		);
 
 		return ResponseEntity
 				.status(HttpStatus.CREATED)
 				.body(
 						mapper.map(saved, CropDto.class)
 				);
+
 	}
+
+	public ResponseEntity fallback(CropDto cropDto) {
+		log.info("fallback");
+		return ResponseEntity
+				.status(HttpStatus.INSUFFICIENT_STORAGE)
+				.body("fallback");
+
+	}
+
 
 	@PatchMapping("/api/crops/{id}")
 	public ResponseEntity updateCrop(@PathVariable Long id, @RequestBody CropDto cropDto) {
 		Optional<Crop> crop = service.updateCrops(id, mapper.map(cropDto, Crop.class));
-		if(!crop.isPresent())
+		if (!crop.isPresent())
 			return ResponseEntity.noContent().build();
 		else {
 			return ResponseEntity
@@ -67,6 +83,7 @@ public class CropController {
 							mapper.map(crop.get(), CropDto.class)
 					);
 		}
+
 	}
 
 

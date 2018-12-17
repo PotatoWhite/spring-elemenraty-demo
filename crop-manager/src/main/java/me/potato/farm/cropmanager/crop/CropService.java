@@ -1,5 +1,7 @@
 package me.potato.farm.cropmanager.crop;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,21 +27,15 @@ public class CropService {
 		return cropRepo.findAll(pageinfo);
 	}
 
-	public Crop saveCrop(Crop crop){
+	public Crop saveCrop(Crop crop) {
 		return cropRepo.saveAndFlush(crop);
 	}
 
-	public Optional<Crop> updateCrops(@NotNull Long id, Crop crop){
+	public Optional<Crop> updateCrops(@NotNull Long id, Crop crop) {
 		boolean byId = cropRepo.existsById(id);
-
-		if(byId){
-			crop.setId(id);
-			return Optional.ofNullable(saveCrop(crop));
-		}
-		else {
-			return Optional.empty();
-		}
-
+		if(byId) return Optional.empty();
+		crop.setId(id);
+		return Optional.of(saveCrop(crop));
 	}
 
 }
