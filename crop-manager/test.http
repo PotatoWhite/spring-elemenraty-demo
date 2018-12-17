@@ -6,7 +6,7 @@ Content-Type: application/json
 {
   "name":"potato",
   "class_name":"root"
-  }
+}
 
 ### PATCH
 
