@@ -512,3 +512,160 @@
       
 - Mysql 이 연결이 되지 않기 때문에 약 5초 후 Connection 관련 에러가 발생한다.
 - HystrixCommand는 Exception을 Hooking 하기 때문에 Advice가 실행되지 않는다.
+
+
+
+## Controller 생성 - Version 03
+1. Client 요청에 대한 입력정보 오류를 친절하게 안내 하기 위해서는 Springframework의 Validation 기능을 사용할 수 있다.
+2. 입력 정보를 담을 CropDto에 Validation 설정을 한다.
+3. Controller 수신시 Validation을 수행한다.
+
+- CropDto에 @NotEmpty를 통해 제약을 추가 할 수 있다.
+- Integer등의 Numeric Type의 경우 @NotNull을 사용할 수 있다.
+    ~~~java
+    package me.potato.farm.cropmanager.crop;
+
+    import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+    import com.fasterxml.jackson.databind.annotation.JsonNaming;
+    import lombok.AllArgsConstructor;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+
+    import javax.validation.constraints.NotEmpty;
+
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+    public class CropDto {
+        private Long id;
+
+        @NotEmpty
+        private String name;
+
+        @NotEmpty
+        private String className;
+    }
+    ~~~
+
+- Springframework의 Validator내장 Bean을 주입 받는다.
+- validate Method를 추가한다.
+- createCrop의 예시를 보면 Optional Type의 Validation 기능을 볼 수 있다.
+    ~~~java
+    package me.potato.farm.cropmanager.crop;
+
+    import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+    import lombok.extern.slf4j.Slf4j;
+    import org.modelmapper.ModelMapper;
+    import org.springframework.data.domain.Page;
+    import org.springframework.data.domain.Pageable;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.validation.BeanPropertyBindingResult;
+    import org.springframework.validation.Errors;
+    import org.springframework.validation.Validator;
+    import org.springframework.web.bind.annotation.*;
+
+    import java.util.Optional;
+    import java.util.stream.Collectors;
+
+    @Slf4j
+    @RestController
+    public class CropController {
+
+        private final CropService service;
+        private final ModelMapper mapper;
+        private final Validator validator;
+
+        public CropController(CropService service, ModelMapper mapper, Validator validator) {
+            this.service = service;
+            this.mapper = mapper;
+            this.validator = validator;
+        }
+
+
+        @GetMapping("/api/crops")
+        public Page<Crop> getPagedCrops(Pageable pageable) {
+            return service.getAllCrops(pageable);
+        }
+
+        @GetMapping("/api/crops/{id}")
+        public ResponseEntity getCrop(@PathVariable("id") Long id) {
+
+            Optional<Crop> crop = service.getCrop(id);
+            if (!crop.isPresent())
+                return ResponseEntity.noContent().build();
+            else {
+                return ResponseEntity.ok(mapper.map(crop.get(), CropDto.class));
+            }
+        }
+
+
+        @HystrixCommand(
+                fallbackMethod = "fallback"
+        )
+        @PostMapping("/api/crops")
+        public ResponseEntity createCrop(@RequestBody CropDto cropDto) throws InterruptedException {
+
+            Optional<String> validateError = validate(cropDto);
+            
+            if (validateError.isPresent())
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body(validateError.get());
+
+
+            Crop saved = service.saveCrop(
+                    mapper.map(cropDto, Crop.class)
+            );
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(
+                            mapper.map(saved, CropDto.class)
+                    );
+
+        }
+
+        private Optional<String> validate(Object object) {
+            Errors errors = new BeanPropertyBindingResult(object, object.getClass().getName());
+            validator.validate(object, errors);
+
+            if (errors.hasErrors()) {
+                String errMessage = errors.getFieldErrors().stream().map(error -> error.getField() + " : " + error.getDefaultMessage()).collect(Collectors.joining(" / "));
+                return Optional.ofNullable(errMessage);
+            }
+
+            return Optional.empty();
+        }
+
+        public ResponseEntity fallback(CropDto cropDto, Throwable throwable) {
+            log.info(throwable.getMessage());
+
+            return ResponseEntity
+                    .status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(throwable.getMessage());
+
+        }
+
+
+        @PatchMapping("/api/crops/{id}")
+        public ResponseEntity updateCrop(@PathVariable Long id, @RequestBody CropDto cropDto) {
+            Optional<Crop> crop = service.updateCrops(id, mapper.map(cropDto, Crop.class));
+            if (!crop.isPresent())
+                return ResponseEntity.noContent().build();
+            else {
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(
+                                mapper.map(crop.get(), CropDto.class)
+                        );
+            }
+
+        }
+
+
+    }
+
+    ~~~

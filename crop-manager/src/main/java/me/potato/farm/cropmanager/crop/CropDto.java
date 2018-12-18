@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+
 
 @Data
 @AllArgsConstructor
@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class CropDto {
 	private Long id;
 
-	@NotNull @NotEmpty
+	@NotEmpty
 	private String name;
 
 	@NotEmpty
