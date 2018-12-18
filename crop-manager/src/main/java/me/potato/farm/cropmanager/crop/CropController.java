@@ -12,6 +12,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.image.CropImageFilter;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -51,8 +52,9 @@ public class CropController {
 			fallbackMethod = "fallback"
 	)
 	@PostMapping("/api/crops")
-	public ResponseEntity createCrop(@RequestBody CropDto cropDto) throws InterruptedException {
+	public ResponseEntity createCrop(@RequestBody CropDto cropDto) {
 
+		log.info(cropDto.toString());
 		Optional<String> validateError = validate(cropDto);
 		if (validateError.isPresent())
 			return ResponseEntity

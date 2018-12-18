@@ -15,6 +15,7 @@ import java.util.Arrays;
 public class RestTemplateConfig {
 
 	@Bean
+	@LoadBalanced
 	public RestTemplate restTemplate() {
 
 		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
