@@ -4,13 +4,13 @@ POST localhost:8080/api/crops
 Content-Type: application/json
 
 {
-  "name":"potato",
+  "name": "potato",
   "class_name":"root"
 }
 
 ### PATCH
 
-PATCH localhost:8080/api/crops/1
+PATCH localhost:8020/api/crops/1
 Content-Type: application/json
 
 {

@@ -11,17 +11,17 @@ import java.util.Optional;
 @Service
 public class CropService {
 
-	private  final CropRepository cropRepo;
+	private final CropRepository cropRepo;
 
 	public CropService(CropRepository cropRepo) {
 		this.cropRepo = cropRepo;
 	}
 
-	public Optional<Crop> getCrop(Long id){
+	public Optional<Crop> getCrop(Long id) {
 		return cropRepo.findById(id);
 	}
 
-	public Page<Crop> getAllCrops(Pageable pageinfo){
+	public Page<Crop> getAllCrops(Pageable pageinfo) {
 		return cropRepo.findAll(pageinfo);
 	}
 
@@ -31,7 +31,7 @@ public class CropService {
 
 	public Optional<Crop> updateCrops(@NotNull Long id, Crop crop) {
 		boolean byId = cropRepo.existsById(id);
-		if(byId) return Optional.empty();
+		if (!byId) return Optional.empty();
 		crop.setId(id);
 		return Optional.of(saveCrop(crop));
 	}
