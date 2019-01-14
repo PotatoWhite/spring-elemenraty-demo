@@ -21,6 +21,7 @@ public class Crop {
 	private Long id;
 
 
+	@Column(unique = true)
 	private String name;
 	private String className;
 

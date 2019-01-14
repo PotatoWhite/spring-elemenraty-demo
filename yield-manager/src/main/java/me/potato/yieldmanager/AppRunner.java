@@ -16,32 +16,32 @@ import org.springframework.web.client.RestTemplate;
 @RibbonClient(name = "crop-manager")
 public class AppRunner implements ApplicationRunner {
 
-	private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
-	@Value("${startup.message}")
-	private String startupMessage;
+    @Value("${startup.message}")
+    private String startupMessage;
 
-	public AppRunner(RestTemplate restTemplate) {
-		this.restTemplate = restTemplate;
-	}
+    public AppRunner(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
-		log.info(startupMessage);
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        log.info(startupMessage);
 
-		CropDto newCrop =CropDto.builder()
-				.name("testPotato")
-				.className("test")
-				.build();
+        CropDto newCrop = CropDto.builder()
+                .name("testPotato")
+                .className("test")
+                .build();
 
-		try {
-			ResponseEntity<CropDto> cropDtoResponseEntity = restTemplate.postForEntity("http://crop-manager/api/crops", newCrop, CropDto.class);
+        try {
+            ResponseEntity<CropDto> cropDtoResponseEntity = restTemplate.postForEntity("http://crop-manager/api/crops", newCrop, CropDto.class);
 
-		}catch (RestClientException ex ){
-			log.info(ex.getClass().toString());
-		}catch (Exception e){
-			e.printStackTrace();
-		}
+        } catch (RestClientException ex) {
+            log.info(ex.getClass().toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 }

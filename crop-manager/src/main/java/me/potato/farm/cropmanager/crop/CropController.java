@@ -53,7 +53,7 @@ public class CropController {
 
         log.info(cropDto.toString());
         return validate(cropDto)
-                .map(errorString -> ResponseEntity.status(BAD_REQUEST).body((Object)errorString))
+                .map(errorString -> ResponseEntity.status(BAD_REQUEST).body((Object) errorString))
                 .orElseGet(() -> {
                     Crop saved = service.saveCrop(mapper.map(cropDto, Crop.class));
                     return ResponseEntity.status(CREATED).body(mapper.map(saved, CropDto.class));
