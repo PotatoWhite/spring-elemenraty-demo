@@ -88,7 +88,7 @@
 
 
 
-## Controller 생성 - Version 01
+## Controller 생성
 1. 기본적인 형태의 Controller 를 생성한다.
 
     ~~~java
