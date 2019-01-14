@@ -1,1 +1,1 @@
-# spring-elemenraty-demo
+# spring-elementary-demo
