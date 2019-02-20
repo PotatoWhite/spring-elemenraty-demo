@@ -35,7 +35,7 @@
     spring.datasource.driver-class-name=com.mysql.jdbc.Driver
     ~~~
 
-    [참고자료:Bindinf Order](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html)
+    [참고자료:Externalized Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html)
 
 ## MySQL DB/계정 생성
 1. database 생성
@@ -144,7 +144,6 @@
     
      @HystrixCommand(
              fallbackMethod = "fallback"
-     )
      @PostMapping("/api/crops")
      public ResponseEntity createCrop(@RequestBody CropDto cropDto) {
     

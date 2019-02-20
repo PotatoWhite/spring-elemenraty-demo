@@ -17,7 +17,7 @@
     spring.application.name=service-configurer
     spring.cloud.config.server.git.uri=https://github.com/PotatoWhite/spring-elementary-demo-config.git
     
-    eureka.client.service-url.default-zone=http://localhost:8761/eurekaa~~~
+    eureka.client.service-url.default-zone=http://localhost:8761/eureka
     ~~~
     
 ## Package 구성
